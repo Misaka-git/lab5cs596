@@ -1,0 +1,48 @@
+from flask import Flask, request, jsonify, render_template
+import math
+import time
+import logging
+
+app = Flask(__name__, template_folder="templates")
+logging.basicConfig(filename="activity_log.txt", level=logging.INFO)
+
+step_count = 0
+jump_count = 0
+last_step_time = 0
+last_jump_time = 0
+step_threshold = 1.2
+jump_threshold = 2.0
+step_cooldown = 0.3
+jump_cooldown = 0.6
+
+@app.route('/')
+def index():
+    return render_template("dashboard.html", steps=step_count, jumps=jump_count)
+
+@app.route('/data', methods=['POST'])
+def handle_data():
+    global step_count, jump_count, last_step_time, last_jump_time
+
+    data = request.get_json()
+    ax = data.get('ax', 0)
+    ay = data.get('ay', 0)
+    az = data.get('az', 0)
+    now = time.time()
+
+    rms = math.sqrt(ax**2 + ay**2 + az**2)
+    print(f"[SERVER] Received at {now:.3f} sec | ax={ax:.2f}, ay={ay:.2f}, az={az:.2f}, RMS={rms:.3f}")
+    logging.info(f"[SERVER] Received at {now:.3f} sec, RMS={rms:.3f}")
+
+    if rms > jump_threshold and (now - last_jump_time) > jump_cooldown:
+        jump_count += 1
+        last_jump_time = now
+        print(f"Jump #{jump_count}")
+    elif rms > step_threshold and (now - last_step_time) > step_cooldown:
+        step_count += 1
+        last_step_time = now
+        print(f"Step #{step_count}")
+
+    return jsonify({"steps": step_count, "jumps": jump_count})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
