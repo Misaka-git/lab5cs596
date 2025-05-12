@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cloud Activity Dashboard</title>
+  <meta http-equiv="refresh" content="2">
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; }
+    h1 { font-size: 2.5em; }
+    .counter { font-size: 2em; margin: 20px; }
+  </style>
+</head>
+<body>
+  <h1> Cloud Activity Monitor</h1>
+  <div class="counter"> Steps: {{ steps }}</div>
+  <div class="counter"> Jumps: {{ jumps }}</div>
+</body>
+</html>
